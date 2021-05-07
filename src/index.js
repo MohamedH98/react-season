@@ -1,17 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+// Import React and ReactDOM libraries
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+import React from "react";
+import ReactDOM from "react-dom";
+import SeasonDisplay from "./SeasonDisplay";
+import Spinner from "./spinner";
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+class App extends React.Component {
+  state = { lat: null, errMessage: "" };
+  render() {
+    if (this.state.errMessage && !this.state.lat) {
+      return <div>Error: {this.state.errMessage}</div>;
+    }
+    if (!this.state.errMessage && this.state.lat) {
+      return <SeasonDisplay lat={this.state.lat} />;
+    }
+    return <Spinner message="Please accept location request" />;
+  }
+  componentDidMount() {
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => this.setState({ lat: position.coords.latitude }),
+      (err) => this.setState({ errMessage: "Can't get loki" })
+    );
+  }
+  componentDidUpdate() {
+    console.log("My component was rerendered");
+  }
+}
+// Take the react compontent and show it on the screen
+ReactDOM.render(<App />, document.getElementById("root"));
+
+if (module.hot) {
+  module.hot.accept();
+}
